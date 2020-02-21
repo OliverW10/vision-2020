@@ -279,11 +279,11 @@ class Vision:
                 self.Connection.send_results(
                     (distance, angle, time.monotonic())
                 )  # distance (meters), angle (radians), timestamp
-            self.CameraManager.send_frame(self.image)
+            self.CameraManager.send_frame(self.display)
 
 
 if __name__ == "__main__":
-    sampleImgs = True
+    sampleImgs = False
     # These imports are here so that one does not have to install cscore
     # (a somewhat difficult project on Windows) to run tests.
     if sampleImgs:
