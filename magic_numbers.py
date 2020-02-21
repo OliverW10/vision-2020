@@ -52,6 +52,9 @@ MIN_CONTOUR_AREA = 50
 LOADING_INNER_OUTER_RATIO = 3.62
 LOADING_RECT_AREA_RATIO = 0.2
 
+POWER_PORT_AREA_RATIO = 0.2
+POWER_PORT_HULL_ALLOWENCE = 10
+
 # Camera parameters (fixed per-camera at a given zoom) These are for the
 # Logitechs
 FOCAL_LENGTH = 3.67  # mm
