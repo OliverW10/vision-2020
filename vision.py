@@ -129,7 +129,7 @@ class Vision:
 
         hullList = []
         # Convert to RGB to draw contour on - shouldn't recreate every time
-        self.display = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR, dst=self.display)
+        self.display = self.frame
 
         _, cnts, _ = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if len(cnts) >= 1:
@@ -149,16 +149,31 @@ class Vision:
                         PP_MAX_AREA_RATIO > area / hull_area > PP_MIN_AREA_RATIO
                         and box[2] > box[3]
                     ):
-                        # print(box) # X,Y,W,H
-                        # print("P %.2f, Area %d, Hull, %d" % (area / hull_area, area, hull_area))
-                        acceptable_cnts.append(current_contour[1])
-                        hullList.append(hull)
+                        # Gets four corners
+                        corners = get_corners_from_contour(current_contour[1])
+                        corners_area = cv2.contourArea(corners)
+                        # sorts the corners so the lowest in the frame is first
+                        sorted_corners = sorted(list(corners), key = lambda x:x[0][1])
+                        #find the furthest left and right corners
+                        left_point = min(sorted_corners, key = lambda x:x[0][0])[0]
+                        right_point = max(sorted_corners, key = lambda x:x[0][0])[0]
 
+                        # draws four corners of all acceptable contours 
+                        for i in range(4):
+                            cv2.circle(self.display, tuple(corners[i][0]), 2, (0, 0, 255))
+
+                        # Checks if the fours points contain the shape contain the contour to see if it is roughly four sided
+                        # Checks that the lower points are in the middle
+                        if(abs(corners_area-hull_area)/hull_area < PP_MAX_CORNER_RATIO
+                            and left_point[0] < sorted_corners[2][0][0] < right_point[0]
+                            and left_point[0] < sorted_corners[3][0][0] < right_point[0]):
+                            acceptable_cnts.append(current_contour[1])
+                            hullList.append(hull)
             # ***This section of code displays the possible targets***
             for i in range(len(acceptable_cnts)):
                 color_G = (0, 255, 0)
                 color_B = (255, 0, 0)
-                cv2.drawContours(self.display, acceptable_cnts, i, color_G)
+                #cv2.drawContours(self.display, acceptable_cnts, i, color_G)
                 cv2.drawContours(self.display, hullList, i, color_B)
 
             if acceptable_cnts:
@@ -171,10 +186,6 @@ class Vision:
                     power_port_contour = acceptable_cnts[0]
                 power_port_points = get_corners_from_contour(power_port_contour)
                 # x, y, w, h = cv2.boundingRect(power_port_contour)
-                for i in range(4):
-                    cv2.circle(
-                        self.display, tuple(power_port_points[i][0]), 3, (0, 0, 255)
-                    )
                 # cv2.imshow("Display", self.display)
                 # cv2.waitKey()
                 return power_port_points
@@ -187,7 +198,7 @@ class Vision:
         self, frame: np.ndarray, points: np.ndarray, printing=False
     ):
         for i in range(len(points)):
-            cv2.circle(frame, (points[i][0][0], points[i][0][1]), 5, (0, 255, 0))
+            cv2.circle(frame, (points[i][0][0], points[i][0][1]), 3, (0, 255, 0))
         if printing == True:
             print(points)
 
