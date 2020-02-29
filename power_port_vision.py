@@ -99,13 +99,9 @@ class Vision:
                     cv2.circle(
                         self.display, tuple(power_port_points[i][0]), 3, (0, 0, 255)
                     )
-                # cv2.imshow("Display", self.display)
-                # cv2.waitKey()
-                return power_port_points
-            else:
-                return None
-        else:
-            return None
+                if len(power_port_points) == 4:
+                	return power_port_points
+        return None
 
     def create_annotated_display(
         self, frame: np.ndarray, points: np.ndarray, printing=False
