@@ -39,7 +39,7 @@ def scale_value(
         return math.copysign(result ** exponent, result)
 
 
-def get_corners_from_contour(contour: np.ndarray, corner_number=4) -> None:
+def get_corners_from_contour(contour: np.ndarray, corner_number=4) -> np.ndarray:
     """Gets the corners of a contour.
 
     cv2 contours found using the cv2.findContours() method are imperfect and not helpful for
